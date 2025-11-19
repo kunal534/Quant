@@ -12,7 +12,7 @@ class OrderBook{
 
     public:
     /*
-    To privite slient / implicent conversion by the complier if a future function calls like orderbook()
+    To prevent privite slient / implicent conversion by the complier if a future function calls like orderbook()
     */
     //1. constuctor for a specific security
     explicit OrderBook(const std::string &sym);

@@ -2,14 +2,14 @@
 #include<iomanip>// input output manipulator
 #include<iostream>
 
-Orderbook::Orderbook(const std::string& sym)symbol(sym){
+OrderBook::OrderBook(const std::string& sym):symbol(sym){
     std::cout<<"Created Order book for: "<<sym<<"\n";
 }
 
 void OrderBook::add_order(const Order& order)
 {
-    // now ther are 2 instance either a orderbook existing for this or else not then create
-    if(order.symbol!= symbol)
+    // now ther are 2 cases either a orderbook existing for this or else not then create
+    if(order.SYM!= symbol)
     {
         std::cout<<"Error in order symbol matching"<<"\n";
         return;
@@ -37,12 +37,12 @@ void OrderBook:: display_book() const
     {
         std::cout<<"no sell order"<<"\n";
     }else{
-        for(const auto&it:sellorder)
+        for(const auto&order:sellorder)
         {
             // setw to show number of character
             std::cout<<std::setw(10)<<order.orderId
                      <<std::setw(10)<<std::fixed<<std::setprecision(2)<<order.price
-                     <<std::setw(10)<<std::order.quantity<<"\n";
+                     <<std::setw(10)<<order.quantity<<"\n";
         }
     }
     std::cout<<"\n";
@@ -53,10 +53,10 @@ void OrderBook:: display_book() const
               << std::setw(10) << "Quantity" << "\n";
     std::cout << "----------------------------------------\n";
     
-    if (buyOrders.empty()) {
+    if (buyorder.empty()) {
         std::cout << "  (no buy orders)\n";
     } else {
-        for (const auto& order : buyOrders) {
+        for (const auto& order : buyorder) {
             std::cout << std::setw(10) << order.orderId
                       << std::setw(10) << std::fixed << std::setprecision(2) << order.price
                       << std::setw(10) << order.quantity << "\n";
@@ -66,12 +66,12 @@ void OrderBook:: display_book() const
     std::cout << "\n==========================================\n\n";
 }
 
-size_t Orderbook:: get_total_order()const{
+size_t OrderBook:: get_total_order()const{
     return buyorder.size()+sellorder.size();
 }
 // a log entry to get us a one liner 
 void Order::print() const
 {
     std::cout<<"Order: "<<orderId<<(side==OrderSide::BUY?"BUY":"SELL")<<
-    " "<<quantity<<" Share of "<<SYM<<" @ $"<<std::fixed<<set::precison(2)<<price<<"\n";
+    " "<<quantity<<" Share of "<<SYM<<" @ $"<<std::fixed<<std::setprecision(2)<<price<<"\n";
 }   
