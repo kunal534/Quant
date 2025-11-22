@@ -1,0 +1,8 @@
+Now with Level-2, these are the new things:
+1. We will group order of same price and excude them with time priority
+2. Sort order book for best bid ask ( using map)
+3. for fast lookup unordered_map
+4. Hence along with previous one these are newer files: a. trade.h( to actully execute a trade ) b. PriceLevel.h
+5. Things to note:
+5.1 : The use of header is that it will act as interface only and very basic to nill logic is needed to be written in this
+5.2 : 
