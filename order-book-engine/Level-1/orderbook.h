@@ -4,6 +4,7 @@
 /*
     A order book is the storing the data and would store the basic structure 
 */
+
 class OrderBook{
     private:
     std::string symbol;

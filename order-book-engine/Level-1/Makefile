@@ -16,8 +16,7 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJECTS) 
 	@echo "Build Complete : ./$(TARGET)"
 
-
-# till this point the executable file name (Orderbook ) is created 
+# till this point the executable file name ( Orderbook ) is created 
 
 # Now we will mention what 
 # The meaning is that: object file a cpp file with same would be there so make it
@@ -33,6 +32,5 @@ clean:
 
 # Rebuild everything
 rebuild: clean all
-
 
 .PHONY: all run clean rebuild

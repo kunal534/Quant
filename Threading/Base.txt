@@ -1,0 +1,9 @@
+
+A thread in this system is used to increase the effcienty of concurrent task as they are designed around the business logic as in 
+orderintake and not. Examples in a trading system:
+• Networking thread → receive raw messages
+• Parsing thread → decode and validate orders
+• Matching engine thread → update order book, match trades
+• Market data thread → publish updates to clients
+
+Each thread runs multiple functions internally, but they all belong to a single business task.

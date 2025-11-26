@@ -1,2 +1,4 @@
 Basic/a.out
 .gitignore
+.DS_Store
+.vscode
