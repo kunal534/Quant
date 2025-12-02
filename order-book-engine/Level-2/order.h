@@ -15,7 +15,7 @@ enum class OrderType{
     LIMIT// executre greater than the aligned price
 };
 
-struct order{
+struct Order{
     uint64_t orderId;
     uint64_t timestamp;
     std::string Symbol;
@@ -25,7 +25,7 @@ struct order{
     uint64_t quantity;
     uint64_t filledquantity;
 
-    order(uint64_t id,std::string sym,double p,OrderSide s,OrderType t,uint64_t q):orderId(id),Symbol(sym),price(p),Side(s), Type(t),quantity(q),filledquantity(0),timestamp(getCurrentTimestamp()){};
+    Order(uint64_t id,std::string sym,double p,OrderSide s,OrderType t,uint64_t q):orderId(id),Symbol(sym),price(p),Side(s), Type(t),quantity(q),filledquantity(0),timestamp(getCurrentTimestamp()){};
 
     static uint64_t getCurrentTimestamp(){
         // steady_clock=> a monotonic clock that moves only in forward ,now as in Captures the current time point according to the steady clock.
