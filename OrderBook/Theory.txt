@@ -1,0 +1,29 @@
+So when we think of a order book it comes to conclusion of showing the order which could be either buy/sell along with quantity and order id 
+The Order_book is deferentiated based on Order_types
+1. Good_Till_Cancel: Order would remain active in the orderbook untill it's full excuted[can be completed in session] or manually cancelled by trader
+2. Fill_and_Kill: Order must be excuted immediately with the existing order  else cancel if any part is left
+3. bids means BUY orders and ask means SELL orders 
+
+
+Some Factor to Note:
+1. Price, quantity can be negative
+2. Orderid would always be positive
+3. The Orderbook_level_Infos(const Level_Infos &bids,const Level_Infos &asks) have const as if called by any other function it should not be allowed to change the given value.
+4. lowest quanity between the order is use to fill the order so we don't overfill any order
+5. Since a single order is gonna be stored in multile data structure in the orderbook so a pointer based reference is made for easier catching and updating it
+6. Incase of modify order we would be needing to get a reference of the order along with it's detail
+7. In case of Order_book bids_ is set as greater as the higher a amount a buyer is willing to pay it means the more egarness
+8. In case of Order_book asks_ is set as samller as the lesser the amount it would means the seller is more eager to sell the stock 
+9. In case of update/delete/modify the order would be needed to remove from the orders_ which have the [order_id, order_entry(orderpointer(Order(order_type,order_id,side,price,quantity,)))] and also from bids_ and asks_
+
+
+Data_structures
+1. Level_info: a Level refers to a specific price point where there are resting buy or sell orders [ Hence there would be quantiy and price at a certain level]
+2. orderbook_level_info: Now in a orderbook there would be 2 sides (buy/sell) with level_info on each side
+3. OrderPointer: Since a single order is being stored in many data structure so a reference pointer is made for it for easy calling
+4. Order_modify: if someone wants to modify order a lightweight copy would be needed so as that can be updated in the orderbook rather than the creating a whole new creation
+5. Trade_Info: Represent the structure that represents the actual execution of a trade of a ask and a bid
+6. OrderBook: The actual area where all the bids and asks are mentioned the structure is like this [price,[a sorted list of orderpointers(which are mapping to the actual order in the memory)]]
+7. asks_/ bids_ : Used to store the orders based on price in either greater or less format which indexes the orderpointers ( a list of orders which stores the orderpointer which is reference to the actual ordes in orders_)
+8. Cancel_order: first removed from the orders_(stores the orders via order_id and pointer to the orders) then it's removed from the asks_ and bids_ which stores the entries based on there price
+
