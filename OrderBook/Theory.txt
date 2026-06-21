@@ -25,5 +25,6 @@ Data_structures
 5. Trade_Info: Represent the structure that represents the actual execution of a trade of a ask and a bid
 6. OrderBook: The actual area where all the bids and asks are mentioned the structure is like this [price,[a sorted list of orderpointers(which are mapping to the actual order in the memory)]]
 7. asks_/ bids_ : Used to store the orders based on price in either greater or less format which indexes the orderpointers ( a list of orders which stores the orderpointer which is reference to the actual ordes in orders_)
-8. Cancel_order: first removed from the orders_(stores the orders via order_id and pointer to the orders) then it's removed from the asks_ and bids_ which stores the entries based on there price
-
+8. Cancel_order: first removed from the orders_(stores the orders via order_id and pointer to the orders) then it's removed from the asks_ and bids_ which stores the entries based on there pric
+9. Order_modify: Use to modify order in the current orderbook for this (order_id, side,price,quanity)
+10. Match_order: handles matching and also the stores them as trade

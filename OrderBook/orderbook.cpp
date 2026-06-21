@@ -4,7 +4,10 @@
 #include<list>
 #include<queue>
 #include<map>
-
+#include<numeric>
+#include<algorithm>
+#include<memory>
+#include<stdexcept>// for std::runtime_error
 enum class OrderTypes {
     Good_Till_Cancel,
     Fill_and_Kill
@@ -145,7 +148,12 @@ class Order_book{
     struct order_entry{
         OrderPointer order_{nullptr}; // actual order
         OrderPointers::iterator location_; // location of the order via reference of it
+
+        order_entry(OrderPointer o=nullptr,
+            OrderPointers::iterator location=OrderPointers::iterator()):
+            order_(o),location_(location){}
     };
+
 
     // for bids
     std::map<Price,OrderPointers,std::greater<Price>>bids_;
@@ -231,7 +239,7 @@ class Order_book{
             }
         }
         // for case of fill and kill if 
-        if(bids_.empty())
+        if(!bids_.empty())
         {
             auto&[_,bids]=*bids_.begin();
             auto& order=bids.front();
@@ -240,7 +248,7 @@ class Order_book{
                 Cancel_Order(order->Get_Order_ID());
             }
         }
-        if(asks_.empty())
+        if(!asks_.empty())
         {
             auto&[_,asks]=*asks_.begin();
             auto order=asks.front();
@@ -254,13 +262,19 @@ class Order_book{
     public:
     Trades Add_orders(OrderPointer order)
     {
-        if(orders_.contains(order->Get_Order_ID()))
+        if(!order) throw std::runtime_error("Null order");
+
+        auto it=orders_.find(order->Get_Order_ID());
+
+        if(it!=orders_.end())
         {
-            auto existing_entry=orders_.find(order->Get_Order_ID());
-            OrderPointer existing_order=existing_entry->second.order_;
-            std::string error_msg="Order ID " +std::to_string(order->Get_Order_ID()) + " already exists [Side: " 
-            + (existing_order->Get_Side()==Side::BUY? "BUY":"SELL") + ", Price: " + std::to_string(existing_order->Get_Price())+ ", Remaing: " + std::to_string(existing_order->Get_remaining_Quantity()) +"]";
-        }
+            OrderPointer existing_order=it->second.order_;
+            std::string error_msg="Order ID "+ std::to_string(order->Get_Order_ID()) + " already exists [Side: " + (existing_order->Get_Side() == Side::BUY?"BUY":"SELL") +
+        "Price: " + std::to_string(existing_order->Get_Price()) + ", Remaining: " +std::to_string(existing_order->Get_remaining_Quantity()) +"]";
+
+        throw std::runtime_error(error_msg);
+        } 
+
         if(order->Get_OrderType()==OrderTypes::Fill_and_Kill && !Can_Match(order->Get_Side(),order->Get_Price()))
         {
             throw std::runtime_error("Can't fullfil this order");
@@ -284,7 +298,7 @@ class Order_book{
         }
         else
         {
-            auto& orders=bids_[order->Get_Price()];
+            auto& orders=asks_[order->Get_Price()];
 
             orders.push_back(order);
             iterator=std::next(orders.begin(),orders.size()-1);
@@ -294,9 +308,11 @@ class Order_book{
     }
     void Cancel_Order(Order_ID orderid)
     {
-        if(!orders_.contains(orderid))
+        auto it=orders_.find(orderid);
+        if(it==orders_.end())
         {
-            std::cout<<"The Order Id doesn't exist in the Order_book"<<std::endl;
+            std::cout<<"Order "<<orderid<<" not found\n";
+            return;
         }
 
         // removed from orders_ now need to remove from asks_,bids_ where the top level are being stored
@@ -317,7 +333,7 @@ class Order_book{
             orders.erase(orderiterator);
             if(orders.empty())
             {
-                asks_.erase(price);
+                bids_.erase(price);
             }
         }
         else
@@ -327,19 +343,60 @@ class Order_book{
             orders.erase(orderiterator);
             if(orders.empty())
             {
-                bids_.erase(price);
+                asks_.erase(price);
             }
         }           
     }
     Trades ordermodify(Order_Modify order)
     {
-        if(!orders_.contains(order.Get_Order_ID()))
+        if(orders_.find(order.Get_Order_ID())==orders_.end())
         {
-            throw std::runtime_error(" The given order doesn't exist in the orderbook");
+            throw std::runtime_error("Order not found");
         }
         const auto&[existingorder,_]=orders_.at(order.Get_Order_ID());
         Cancel_Order(order.Get_Order_ID());
         return Add_orders(order.To_Order_pointer(existingorder->Get_OrderType()));
     }
-    
+    std::size_t Size() const{ return orders_.size();}
+
+
+    Orderbook_level_Infos Get_Order_Infos()const{
+        Level_Infos ask_Infos,bid_Infos;
+
+        ask_Infos.reserve(orders_.size());
+        bid_Infos.reserve(orders_.size());
+        
+        // lambda function 
+        auto Create_Level_Infos=[](Price price, const OrderPointers& orders){
+            Quantity total_quantity=std::accumulate(
+                orders.begin(),
+                orders.end(),
+                (Quantity)0,
+                [](Quantity running_sum,const OrderPointer& order){
+                    return running_sum + order->Get_remaining_Quantity();
+                }
+            );
+            return Level_Info{price,total_quantity};
+        };
+        
+        for(const auto&[price,order_pointer]:bids_)
+        {
+            bid_Infos.push_back(Create_Level_Infos(price,order_pointer));
+        }
+
+        for(const auto&[price,order_pointer]:asks_)
+        {
+            ask_Infos.push_back(Create_Level_Infos(price,order_pointer));
+        }
+        return Orderbook_level_Infos{bid_Infos,ask_Infos};
+    }
 };
+
+int main()
+{
+    Order_book orderbook;
+    const Order_ID order_id=1;
+    orderbook.Add_orders(std::make_shared<Order>(OrderTypes::Good_Till_Cancel,order_id,Side::BUY,10000,10));
+    std::cout<<orderbook.Size()<<std::endl;
+    return 0;
+}
