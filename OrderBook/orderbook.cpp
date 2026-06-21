@@ -8,6 +8,8 @@
 #include<algorithm>
 #include<memory>
 #include<stdexcept>// for std::runtime_error
+
+//---- Enums----
 enum class OrderTypes {
     Good_Till_Cancel,
     Fill_and_Kill
@@ -18,10 +20,13 @@ enum class Side{
     SELL
 };
 
+// --- Type Aliases----
 using Price=std::uint32_t;
 using Quantity=std::uint32_t;
 using Order_ID=std::uint64_t;
 
+
+// ----Level_Info-----
 struct Level_Info{
     Price price_;
     Quantity quantity_;
@@ -29,6 +34,7 @@ struct Level_Info{
 
 using Level_Infos=std::vector<Level_Info>;
 
+// --- Orderebook Level Snapshot ---
 class Orderbook_level_Infos
 {
     public:
@@ -46,6 +52,7 @@ class Orderbook_level_Infos
 
 };
 
+// ---- Order ----
 class Order{
     public:
     Order(OrderTypes order_type,Order_ID order_id, Side side,Price price, Quantity quantity)
@@ -87,6 +94,7 @@ class Order{
 using OrderPointer =std::shared_ptr<Order>;
 using OrderPointers= std::list<OrderPointer>;
 
+// ---- Order Modify ----
 class Order_Modify{
     public:
     Order_Modify(Order_ID order_id,Side side,Price price,Quantity quantity):
@@ -116,6 +124,7 @@ class Order_Modify{
     Quantity quantity_;
 };
 
+// ---- Trade Info ----
 struct Trade_Info{
     Order_ID orderid_;
     Price price_;
@@ -143,6 +152,7 @@ class Trade{
 
 using Trades= std::vector<Trade>;
 
+// ---- Order Book ----
 class Order_book{
     private:
     struct order_entry{
@@ -185,6 +195,7 @@ class Order_book{
         }
     }
 
+    // 
     Trades Match_Orders(){
         Trades trades;
         trades.reserve(orders_.size());
