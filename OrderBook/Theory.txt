@@ -3,6 +3,10 @@ The Order_book is deferentiated based on Order_types
 1. Good_Till_Cancel: Order would remain active in the orderbook untill it's full excuted[can be completed in session] or manually cancelled by trader
 2. Fill_and_Kill: Order must be excuted immediately with the existing order  else cancel if any part is left
 3. bids means BUY orders and ask means SELL orders 
+4. There are 3 types of ptr used:
+    a. make_unique => a helper function that creates a unique_ptr
+    b. shared_ptr => Multiple owner many pointer can target to same object
+    c. unique_ptr => only one owner at a time, ownershp can't be coplied but transfer
 
 
 Some Factor to Note:
@@ -28,3 +32,15 @@ Data_structures
 8. Cancel_order: first removed from the orders_(stores the orders via order_id and pointer to the orders) then it's removed from the asks_ and bids_ which stores the entries based on there pric
 9. Order_modify: Use to modify order in the current orderbook for this (order_id, side,price,quanity)
 10. Match_order: handles matching and also the stores them as trade
+
+
+
+---For google test---
+
+------------------.H ( header file):-------------------
+1. To use strucuture/classes and method defined in the orderbook.cpp file an interface of it is needed to be defined ( which tells the complier what exists without providing the full implementation ) this file is know as a header file 
+2. In this the meaning of #ifndef means( if not defined ) it a check of a macro ( defined by #define ) ended with #endif, macro is name given to a segment of code which is c++ preprocessor replaces every ocuurence of macro with the actual code before actual complilation occurs.
+
+------------------test.cpp file----------------------------
+1. test fixture: a class that provides a consistne reusable environment for multiple test cases
+2. 
