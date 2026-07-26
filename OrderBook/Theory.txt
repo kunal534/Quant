@@ -41,6 +41,31 @@ Data_structures
 1. To use strucuture/classes and method defined in the orderbook.cpp file an interface of it is needed to be defined ( which tells the complier what exists without providing the full implementation ) this file is know as a header file 
 2. In this the meaning of #ifndef means( if not defined ) it a check of a macro ( defined by #define ) ended with #endif, macro is name given to a segment of code which is c++ preprocessor replaces every ocuurence of macro with the actual code before actual complilation occurs.
 
-------------------test.cpp file----------------------------
-1. test fixture: a class that provides a consistne reusable environment for multiple test cases
-2. 
+-------------------CLI Arguments---------------------
+1. this is a string of text/ space-separated token that a user types after the program name is loaded in a terminal which gets passed into the program's main() function at the startup to modify it's behavior
+2. types of arguments:
+eg: ls -1 --block-size k ~/Documents
+    in this the ls is a commands
+    -1 is a flag 
+    --block-size is a argument with parameter of value k
+    ~/Documents is a position argument 
+
+------------------orderbook_test.cpp file----------------------------
+1. test fixture: a class that provides a consistne reusable environment for multiple test cases and used via TEST_F
+2. ASSERT_EQ(val1,val2): means make an fatal assertion that both the value val1 === val2 and if failed the code would stop 
+3. Google test is used to input flags eg:
+    --gtest_filter=pattern	Run only specific tests (debugging, fast feedback)
+    --gtest_repeat=N	Run tests N times (catch flaky failures)
+    --gtest_shuffle	Randomize test order (find hidden dependencies)
+    --gtest_output=xml:file.xml	Generate CI‑friendly reports (Jenkins, GitLab)
+    --gtest_break_on_failure	Drop into debugger on first failure
+    --gtest_verbose=1	Show more details about what’s running
+    which are done via help of argc/argv => when we run the test the argv along with argc is send and the flow happens in this way:
+
+    when this is pressed:
+    ./orderbook_test_basic --gtest_filter=addorder [ Here argv[0]= ./orderbook_test_basic , argv[1]= --gtest_filter=addorder]
+    Shell excutes the exec system call and passes specific pieces of data to the OS kernal which allocates the ram resources and gives process id 
+    After this the C runtime ( CRT ) takes over and does the housekeeping : intitalize global static object, sets up the heap retrive count 2 then calls the main()
+    CRT passes the formatted argc and argv directly to the main() wiht into argc =2 and argv[0],[1] 
+    main () passes this info to the googletest recognize the flag ( --gtest_filter) removes the flag and update the internal argc to counter down to 1
+    main runs the RUN_ALL_TESTS() google test iterates it's entire global list and check the test name ounce found excutes and passes the output before passing it teardown the test fixture via TearDown()
