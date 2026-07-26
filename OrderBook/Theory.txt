@@ -7,7 +7,8 @@ The Order_book is deferentiated based on Order_types
     a. make_unique => a helper function that creates a unique_ptr
     b. shared_ptr => Multiple owner many pointer can target to same object
     c. unique_ptr => only one owner at a time, ownershp can't be coplied but transfer
-
+5. bid=> Highest price a buyer is willing to pay 
+6. ask=> lowest price a seller is willing to accept
 
 Some Factor to Note:
 1. Price, quantity can be negative
