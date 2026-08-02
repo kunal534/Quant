@@ -9,10 +9,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-# Add your orderbook source
+# Adding orderbook source
 add_library(orderbook orderbook.cpp)
 
-# Add the test executable
+# Adding test executable
 add_executable(orderbook_test orderbook_test_basic.cpp)
 
 # Link libraries
