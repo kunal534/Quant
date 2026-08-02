@@ -20,6 +20,7 @@ Some Factor to Note:
 7. In case of Order_book bids_ is set as greater as the higher a amount a buyer is willing to pay it means the more egarness
 8. In case of Order_book asks_ is set as samller as the lesser the amount it would means the seller is more eager to sell the stock 
 9. In case of update/delete/modify the order would be needed to remove from the orders_ which have the [order_id, order_entry(orderpointer(Order(order_type,order_id,side,price,quantity,)))] and also from bids_ and asks_
+10. Many components are declared via Pragma once ( so as to save compilation time)
 
 
 Data_structures
@@ -70,3 +71,4 @@ eg: ls -1 --block-size k ~/Documents
     CRT passes the formatted argc and argv directly to the main() wiht into argc =2 and argv[0],[1] 
     main () passes this info to the googletest recognize the flag ( --gtest_filter) removes the flag and update the internal argc to counter down to 1
     main runs the RUN_ALL_TESTS() google test iterates it's entire global list and check the test name ounce found excutes and passes the output before passing it teardown the test fixture via TearDown()
+

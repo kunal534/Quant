@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/orderbook_test.dir/orderbook_test_basic.cpp.o -o orderbook_test  liborderbook.a /opt/homebrew/lib/libgtest.a -lpthread

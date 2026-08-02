@@ -1,0 +1,11 @@
+-------------------Terms-----------------
+1. Good_Till_Cancel: Order remains active until it's fully filled or manually cancel at a specifc time (so price, order_id, maintatining how many are left is important in this case)
+2. Fill_and_Kill: the order is checked immediately against the current listed at orderbook side which user asked for and any reamining are canceled so partail order can be there.
+3. Fill_or_Kil: In this if the order is not filled fully at the time the whole order is cancel (easier as just to need check if at that price is the quanity is >= asked )
+4. Good_for_day: The order will remain active for a day only (so time contrant is added a new order_book type )
+5. Market: Means the price is not a issue by user they just want there order to be filled at the price avalible 
+
+
+------------About Files----------------
+1. using.h: mention the datastructure we are gonna be using in the code
+2. Trade_Info: store the trade happens at a certain price so quanity and it's orderid
