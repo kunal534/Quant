@@ -1,0 +1,10 @@
+# Logs — AGENTS.md transcript, never commit
+log.txt
+
+# Env / secrets
+.env
+*.pyc
+__pycache__/
+
+plan.md
+final_main.py

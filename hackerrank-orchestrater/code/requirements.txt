@@ -1,0 +1,2 @@
+# stdlib only — no dependencies required
+# Python >= 3.10 recommended
