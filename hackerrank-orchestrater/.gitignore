@@ -8,3 +8,6 @@ __pycache__/
 
 plan.md
 final_main.py
+
+.DS_Store
+output.csv
