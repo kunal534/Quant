@@ -5,7 +5,26 @@
 4. Good_for_day: The order will remain active for a day only (so time contrant is added a new order_book type )
 5. Market: Means the price is not a issue by user they just want there order to be filled at the price avalible 
 
-
 ------------About Files----------------
 1. using.h: mention the datastructure we are gonna be using in the code
 2. Trade_Info: store the trade happens at a certain price so quanity and it's orderid
+3. Level_Info: list of ask/bids against a certain price
+4. Trade: Whenever any trade happens it will store an entry for it
+5. order: stores a complete order
+6. nan: not a number constructor for atmarket type
+7. Order_Modify: handles the datastructure to process orders which are modified
+8. OrderbookLevelInfos: snapshot of current asks and bid present
+9. orderbook; it's the core header file which handles the continus check of ask vs bid
+
+--------------Logic-----------------
+1. Since code is running a mutex + thread + condition_value which can't be copied we need to make sure that the other 3 constructor are deleted
+    all 5 constructor are:
+    1. Default [ Orderbook() ]
+    2. copy constructor [ Orderbook& ] -> Creates a new object as a copy of an existing one
+    3. copy assignment [ void operator=( const Orderbook& ) ] -> Overwrites an existing object with another's contents
+    4. move constructor [ Orderbook&& ] -> Creates a new object by stealing from a temporary
+    5. move assignment [ void operator=( const Orderbook&& ) ] -> Overwrites an existing object by stealing from a temporary
+    6. destructure 
+2. temporary here means an unnamed object created by complier to hold a valu just long enough to use it then it deleted it ex any variable which is not used or changed after 
+3. Due to RAII (Resource Acquistion is initialization ) we don't need to explicity handle the release of resource as RAII gurantee that the Acquired resource 
+    will be release when the lifetime of their controlling object ends, in reverse order of acquisition.
