@@ -1,6 +1,7 @@
 .vscode/
 build/
 .DS_Store
+*.out
 
 # macOS
 .DS_Store
