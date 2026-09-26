@@ -23,7 +23,8 @@ class Order{
     OrderId GetOrderId() const {return orderid_;}
     Quantity GetRemainingQuantity() const {return remainingQuantity_;}
     Price GetPrice() const {return price_;}
-
+    Side GetSide() const {return side_;}
+    OrderType GetOrderType() const {return ordertype_;}
     bool isFilled() const { return remainingQuantity_==0?1:0; }
     
     void Fill(Quantity quantity)
@@ -34,7 +35,15 @@ class Order{
         }
     }
 
+    void ToGoodTillCancel(Price price ){
+        if(GetOrderType()!=OrderType::Market)
+        {
+            throw std::logic_error(std::format("Order ({}) cannot have it's price adjusted only Market type can",GetOrderId()));
 
+        }
+        price_=price;
+        ordertype_=OrderType::Good_Till_Cancel;
+    }
     private:
     OrderType ordertype_;
     Price price_;

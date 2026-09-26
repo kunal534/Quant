@@ -7,6 +7,7 @@
 #include "Trade.h"
 
 #include<map>
+#include<thread>
 #include<unordered_map>
 class Orderbook{
     private:
@@ -17,10 +18,10 @@ class Orderbook{
         OrderPointers::iterator location_;
     };
     // for every accumulated ask/bids at a certain price
-    struct LevelData{
+    struct LevelActions{
         Quantity quantity_{0};// total number of order at a price
         Quantity OrderCount_{};// total count of order
-        enum class action{
+        enum class Action{
             Add,
             Remove,
             Match
@@ -28,7 +29,7 @@ class Orderbook{
     };
     
     // data at per price
-    std::unordered_map<Price,OrderEntry>data_;
+    std::unordered_map<Price,LevelActions>data_;
     // bids
     std::map<Price,OrderPointers,std::greater<Price>>bids_;
 
@@ -36,16 +37,24 @@ class Orderbook{
     std::map<Price,OrderPointers,std::less<Price>>asks_;
 
     // to get order location quickly
-    std::unordered_map<OrderId,OrderEntry>order_;
+    std::unordered_map<OrderId,OrderEntry>orders_;
 
-    mutable std::mutex ordersMutex;
+    // mutex is termed as mutable as function are const and mutex state would need to be change from lock to unlock 
+    mutable std::mutex ordersMutex_;
+    std::thread orderPruneThread_;
+
+    bool CanFullyFill(Side side,Price price,Quantity quantity)const;
+    bool CanMatch(Side side, Price price)const;
+    void OnOrderAdded(OrderPointer);
+    Trades MatchOrders();
+    void UpdateLevelInfo(Price price,Quantity quantity,LevelActions::Action action);
     public:
 
     Orderbook();
-    Orderbook(const Orderbook&) = delete;
-    void operator=(const Orderbook& ) = delete;
-    Orderbook(const Orderbook&& )=delete;
-    void operator= (const Orderbook&& )=delete;
+    Orderbook(const Orderbook&) = delete; // copy constructor
+    void operator=(const Orderbook& ) = delete; // copy assignment
+    Orderbook(const Orderbook&& )=delete; // move constructor
+    void operator= (const Orderbook&& )=delete; // move assignment
     ~Orderbook();
 
     Trades AddOrder(OrderPointer order);
