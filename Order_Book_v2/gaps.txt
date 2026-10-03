@@ -1,0 +1,2 @@
+1. Current file doesn't have a proper price display orderbook to show price display
+2. there is no search order based on id

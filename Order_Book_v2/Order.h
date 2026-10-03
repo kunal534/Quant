@@ -35,7 +35,7 @@ class Order{
         }
     }
 
-    void ToGoodTillCancel(Price price ){
+    void GoodTillCancel(Price price ){
         if(GetOrderType()!=OrderType::Market)
         {
             throw std::logic_error(std::format("Order ({}) cannot have it's price adjusted only Market type can",GetOrderId()));

@@ -28,5 +28,11 @@
 2. temporary here means an unnamed object created by complier to hold a valu just long enough to use it then it deleted it ex any variable which is not used or changed after 
 3. Due to RAII (Resource Acquistion is initialization ) we don't need to explicity handle the release of resource as RAII gurantee that the Acquired resource 
     will be release when the lifetime of their controlling object ends, in reverse order of acquisition.
-
 4. Since it's a priority order queue so only best bid and ask are taken into consideration
+5. For cancelorder; since current code is gonna include logic of Good_for_day too which could be many so a for loop to cancel all
+6. In total there are 3 data structure which holds the order:
+    1. orders_ -> holds all the orders along with there iterator
+    2. asks_ && bids_ -> holds order based on price and a list of orderpointer
+7. Canmatch doesn't need quanity as it woudl check against best value and remove the rest
+8. CanFullyFill does need to do a sweep of whole values to check if it's possible to fully fill else can it
+9. Used Optional template as to avoid error with nan as nan can break the flow silently

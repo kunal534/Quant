@@ -3,6 +3,53 @@
 #include<numeric>
 #include<chrono>
 
+
+void Orderbook::CancelOrderInternals(OrderId orderid)
+{
+    if(!orders_.contains(orderid))return;
+
+    const auto [order,iterator]=orders_.at(orderid);
+    orders_.erase(orderid);
+    if(order->GetSide()==Side::Buy)
+    {
+        auto price=order->GetPrice();
+        auto& orders_at_price=bids_.at(price);// orderpointer list at a specific bids
+        orders_at_price.erase(iterator);
+        if(orders_at_price.empty())
+        {
+            bids_.erase(price);
+        }
+    }
+    else{
+        auto price=order->GetPrice();
+        auto& orders_at_price=asks_.at(price);
+        orders_at_price.erase(iterator);
+        if(orders_at_price.empty())
+        {
+            asks_.erase(price);
+        }
+    }
+}
+
+void Orderbook::CancelOrders(OrderIds orderids)
+{
+    std::scoped_lock orderbook_lock{ordersMutex_};
+    for(const auto& orderid:orderids)
+    {
+        CancelOrderInternals(orderid);
+    }
+}
+void Orderbook::CancelOrder(OrderId orderid)
+{
+    std::scoped_lock orderbook_lock{ ordersMutex_};
+    CancelOrderInternals(orderid);
+}
+
+
+void Orderbook::OnOrderCancel(OrderPointer order)
+{
+    UpdateLevelInfo(order->GetPrice(),order->GetRemainingQuantity(),LevelActions::Action::Remove);
+}
 void Orderbook::OnOrderAdded(OrderPointer order)
 {
     UpdateLevelInfo(order->GetPrice(),order->GetRemainingQuantity(),LevelActions::Action::Add);
@@ -111,12 +158,12 @@ Trades Orderbook::AddOrder(OrderPointer order)
         {
             // used deference as rbegin provides a pointer 
             const auto&[worstAsk,_]=*asks_.rbegin();
-            order->ToGoodTillCancel(worstAsk);
+            order->GoodTillCancel(worstAsk);
         }
         else if(order->GetSide()==Side::Sell && !bids_.empty())
         {
             const auto&[worstBid,_]=*bids_.rbegin();
-            order->ToGoodTillCancel(worstBid);
+            order->GoodTillCancel(worstBid);
         }
         else
         {
@@ -151,4 +198,64 @@ Trades Orderbook::AddOrder(OrderPointer order)
     orders_.insert({order->GetOrderId(),OrderEntry({order,iterator})});
     OnOrderAdded(order);
     return MatchOrders();
+}
+bool Orderbook::CanMatch(Side side, Price price)const{
+    if(side==Side::Buy)
+    {
+        if(asks_.empty())
+        {
+            return false;
+        }
+        const auto& [best_asks,_]=*asks_.begin();
+        return price>=best_asks;
+    }
+    else
+    {
+        if(bids_.empty())
+        {
+            return false;
+        }
+        const auto& [best_bids,_]=*bids_.begin();
+        return price<=best_bids;
+    }
+}
+bool Orderbook::CanFullyFill(Side side, Price price, Quantity quantity)const
+{
+    if(!CanMatch(side,price))
+    {
+        return false;
+    }
+    std::optional<Price>threshold;
+    if(side==Side::Buy)
+    {
+        const auto& [best_ask,_]=*asks_.begin();
+        threshold=best_ask;
+    }
+    else
+    {
+        const auto& [best_bid,_]=*bids_.begin();
+        threshold=best_bid;
+    }
+    for(const auto&[levelPrice,levelData]:data_)
+    {
+        // since data stores both ask and bid we need to filter out values which are purely bid or purely ask
+        if(threshold.has_value()&&(
+            (side==Side::Buy && threshold.value()<levelPrice)||
+            (side==Side::Sell && threshold.value()>levelPrice)
+        )){
+            continue;
+        }
+
+        if((side==Side::Buy && price<levelPrice)||
+    (side==Side::Sell && price>levelPrice))
+    {
+        continue;
+    }
+        if(quantity <=levelData.quantity_)
+        {
+            return true;
+        }
+        quantity-=levelData.quantity_;
+    }
+    return false;
 }
