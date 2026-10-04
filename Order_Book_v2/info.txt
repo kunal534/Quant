@@ -12,7 +12,7 @@
 4. Trade: Whenever any trade happens it will store an entry for it
 5. order: stores a complete order
 6. nan: not a number constructor for atmarket type
-7. Order_Modify: handles the datastructure to process orders which are modified
+7. Order_Modify: handles the datastructure to process orders which are modified, user doesn't need to give ordertype as this could be fetched form stored order in book
 8. OrderbookLevelInfos: snapshot of current asks and bid present
 9. orderbook; it's the core header file which handles the continus check of ask vs bid
 
@@ -36,3 +36,10 @@
 7. Canmatch doesn't need quanity as it woudl check against best value and remove the rest
 8. CanFullyFill does need to do a sweep of whole values to check if it's possible to fully fill else can it
 9. Used Optional template as to avoid error with nan as nan can break the flow silently
+10. Logic for PruneGoodForDay():
+    1. need to get a at current time for this sysmtem_clock class is used from chrono library but the given value is opaque time_point and details like day and hours
+       can't be calculate , hence it's converted to numeric value via to_time_t class which calculates it form 1970 in sec then to readable calender via localtime_s 
+       in mac the definition is localtime_r(pointer, structure)
+    2. incase of prune atomic is used to avoid strave condtion which could happened via mutex lock and atomic is faster as it a cpu instruction
+    3. Here we need to use unique_lock because it allows the thread to release lock while it sleep during the market active time frame and requires it when activated
+    4. The destructor sets shutdown_ = true to command the prune thread to stop, then calls notify_one() to wake it if it's sleeping, then calls join() to wait for it to actually exit before the object is freed.

@@ -42,13 +42,16 @@ class Orderbook{
     // mutex is termed as mutable as function are const and mutex state would need to be change from lock to unlock 
     mutable std::mutex ordersMutex_;
     std::thread orderPruneThread_;
-
+    std::atomic<bool>shutdown_;
+    std::condition_variable shutdownConditionVariable_;// used to interupt sleeping thread
     bool CanFullyFill(Side side,Price price,Quantity quantity)const;
     bool CanMatch(Side side, Price price)const;
     void OnOrderAdded(OrderPointer);
     void OnOrderCancel(OrderPointer);
+
     Trades MatchOrders();
     void UpdateLevelInfo(Price price,Quantity quantity,LevelActions::Action action);
+    void PruneGoodForDayOrders();
     public:
 
     Orderbook();

@@ -2,7 +2,7 @@
 
 #include<numeric>
 #include<chrono>
-
+#include<ctime>
 
 void Orderbook::CancelOrderInternals(OrderId orderid)
 {
@@ -258,4 +258,50 @@ bool Orderbook::CanFullyFill(Side side, Price price, Quantity quantity)const
         quantity-=levelData.quantity_;
     }
     return false;
+}
+Trades Orderbook::ModifyOrder(OrderModify order)
+    {   
+        OrderType ordertype;
+        {
+            std::scoped_lock ordersLock { ordersMutex_ };
+            if(!orders_.contains(order.GetOrderId()))
+            {
+                return {};
+            }
+            const auto& [existing_Order,_]=orders_.at(order.GetOrderId());
+            ordertype=existing_Order->GetOrderType();// deference via pointer hence -> and no . 
+        }   
+        CancelOrder(order.GetOrderId());
+        return AddOrder(order.ToOrderPointer(ordertype));
+    }
+
+void Orderbook::PruneGoodForDayOrders()
+{
+    using namespace std::chrono;
+    const auto end=hours(16);
+    while(true){
+        const auto now=system_clock::now();// opaque value -> means that it's like a black box
+        const auto now_=system_clock::to_time_t(now);// in numeric value from 19070
+        std::tm now_in_parts{};
+        localtime_r(&now_,&now_in_parts);// for windows the definition is in reverse order
+        
+        // current time is passed then make a new thread for tommorow 
+        if(now_in_parts.tm_hour>=end.count())
+        {
+            now_in_parts.tm_mday+=1;
+        }
+        now_in_parts.tm_hour=end.count();
+        now_in_parts.tm_min=0;
+        now_in_parts.tm_sec=0;
+
+        auto next=system_clock::from_time_t(mktime(&now_in_parts));// converts back C style time_t to modern time_point
+        // tm_year,tm_mday... -> mktime(calender-> epoch seconds) -> time_t (3131451)
+        auto sleep_till=next-now + milliseconds(100);// added 100 millisecond extra for safety margin
+        // the case where orderbook is getting destroyed sleeping prunethread would also needed to be killed
+        {
+            std::unique_lock prune_lock{ ordersMutex_};
+            
+            
+        }
+    }
 }

@@ -16,7 +16,7 @@ class OrderModify{
 
     // a shared poiner to store new order which are modified
 
-    OrderPointer ToOrderModify(OrderType type)const
+    OrderPointer ToOrderPointer(OrderType type)const
     {
         return std::make_shared<Order>(type,GetOrderId(),GetPrice(),GetQuantity());
     }
