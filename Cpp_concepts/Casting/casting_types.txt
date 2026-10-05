@@ -1,0 +1,6 @@
+There are 4 types casting 
+    1. Static cast
+    2. Const cast
+    3. Dyanmic cast
+    4. Reinterpret cast
+
