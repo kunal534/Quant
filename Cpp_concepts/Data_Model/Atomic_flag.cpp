@@ -10,6 +10,7 @@ class Spinlock
     std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
 
 public:
+    // purpose of memory_order_acquire is to make sure that complier doesn;t change the order of execution for optimization
     void Lock()
     {
         while (flag_.test_and_set(std::memory_order_acquire))
