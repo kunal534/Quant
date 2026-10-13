@@ -18,11 +18,10 @@ public:
         }
     }
 
-    bool TryLock()
+    bool is_Lock()
     {
-        return !flag_.test_and_set(std::memory_order_acquire);
+        return flag_.test_and_set(std::memory_order_acquire);// return previous value and update flag value
     }
-
     void Unlock()
     {
         flag_.clear(std::memory_order_release);
@@ -36,7 +35,7 @@ int main()
     std::thread t1([&]
     {
         std::cout << "[T1] acquiring lock\n";
-        lock.Lock();
+        lock.Lock();// set's the flag_ to 1 
         std::cout << "[T1] lock acquired. holding for 2 seconds\n";
 
         std::this_thread::sleep_for(seconds(2));
@@ -45,24 +44,21 @@ int main()
         lock.Unlock();
     });
 
-    std::this_thread::sleep_for(milliseconds(100));
 
     std::thread t2([&]
     {
         std::cout << "[T2] trying to acquire lock\n";
         int attempts = 0;
 
-        while (!lock.TryLock())
+        while (lock.is_Lock())
         {
             ++attempts;
             std::cout << "[T2] lock is busy, retrying... (attempt "
                       << attempts << ")\n";
-            std::this_thread::sleep_for(milliseconds(300));
         }
 
         std::cout << "[T2] lock acquired after " << attempts
                   << " attempts\n";
-        lock.Unlock();
     });
 
     t1.join();
