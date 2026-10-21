@@ -43,3 +43,5 @@
     2. incase of prune atomic is used to avoid strave condtion which could happened via mutex lock and atomic is faster as it a cpu instruction
     3. Here we need to use unique_lock because it allows the thread to release lock while it sleep during the market active time frame and requires it when activated
     4. The destructor sets shutdown_ = true to command the prune thread to stop, then calls notify_one() to wake it if it's sleeping, then calls join() to wait for it to actually exit before the object is freed.
+11. memory_order_acquire = It's is an ordering constraint on an atomic load that forbids any memory read or write appearing after the load from being reordered to before it, and, when the load reads a value written by a release store, guarantees that all memory writes made by the storing thread before that store are visible to the loading thread after this load.
+12. barrier= line in the instruction stream that other memory operations are not allowed to cross.

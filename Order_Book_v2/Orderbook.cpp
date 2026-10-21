@@ -300,8 +300,11 @@ void Orderbook::PruneGoodForDayOrders()
         // the case where orderbook is getting destroyed sleeping prunethread would also needed to be killed
         {
             std::unique_lock prune_lock{ ordersMutex_};
-            
-            
+            // here relaxed can't be used as arm processor are know for weak ordering and it might see old/incorrect flag
+            if(shutdown_.load(std::memory_order_acquire))
+            {
+                return ;
+            }
         }
     }
 }
