@@ -1,0 +1,31 @@
+The atomic operation can be divided into 3 category:
+1. Load: Read value of variable
+2. Store: Writing a value into a variable
+3. Read_Modify_write: Read old value and update it without being interuppted 
+
+Memory_Order that could be given to complier:
+
+memory_order_relaxed: The loosest constraint, guarantees that the specific operation itself is atomic. It allows the compiler/CPU to reorder this operation freely relative to other memory operations.
+memory_order_release: (Used for Stores). It ensures that all memory writes before this store are visible to other threads that "acquire" this store.
+memory_order_acquire: (Used for Loads). It ensures that no memory reads/writes after this load can be reordered before it. It "picks up" the data released by a "release" store.
+memory_order_acq_rel: A combination of Acquire and Release. Used specifically for Read-Modify-Write operations because they do both a load and a store.
+memory_order_seq_cst: Sequential Consistency. This is the strictest mode. It creates a single global timeline for all operations. If you don't specify anything, this is the default. It is the easiest to understand but the slowest.
+
+conclusion:
+1. Store: Can be relaxed, release, or seq_cst.
+2. Load : Can be relaxed, acquire, consume or seq_cst
+3. Read-Modify-Write: Can use ALL of them.
+
+Logic for definition:
+Modern CPU have multiple Core with 2 level of memory:
+1. L1 Cache -> these are the local cache of each core 
+2. RAM -> this the shared memory
+
+In case of release we are saying :
+flush all the value of your local cache to the ram before excuting this store on atomic varible so that it's visible to other threads
+
+In case of acquire we are saying :
+Pause here. Do not let any subsequent reads or writes move above this line until I have confirmed I am seeing the absolute latest version of this flag.
+
+Atomic store operation tagged with memory_order_release will have synchronized with relationship with atomic read operation tagged
+with memory_order_acquire.
