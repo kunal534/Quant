@@ -298,13 +298,40 @@ void Orderbook::PruneGoodForDayOrders()
         // tm_year,tm_mday... -> mktime(calender-> epoch seconds) -> time_t (3131451)
         auto sleep_till=next-now + milliseconds(100);// added 100 millisecond extra for safety margin
         // the case where orderbook is getting destroyed sleeping prunethread would also needed to be killed
+        // and also we need to make sure tha complier don't shift operation sequence after this
         {
-            std::unique_lock prune_lock{ ordersMutex_};
-            // here relaxed can't be used as arm processor are know for weak ordering and it might see old/incorrect flag
-            if(shutdown_.load(std::memory_order_acquire))
+            std::unique_lock Prune_lock {ordersMutex_};
+            
+            // if timeout has not happened return back from here
+            if(shutdown_.load(std::memory_order_acquire)|| shutdownConditionVariable_.wait_for(Prune_lock,sleep_till)==std::cv_status::no_timeout)
             {
-                return ;
+                return;
             }
         }
+        OrderIds orderIds_;
+        {
+            std::scoped_lock orderlock{ordersMutex_};
+
+            for(const auto&[_,entry]:orders_)
+            {
+                // getting to the order
+                const auto&[order,_]=entry;
+                
+                if(order->GetOrderType()==OrderType::Good_for_day)
+                {
+                    orderIds_.push_back(order->GetOrderId());
+                }
+            }
+        } 
+        CancelOrders(orderIds_);
     }
+}
+// lambda initialisation
+Orderbook::Orderbook(): orderPruneThread_ { [this] {PruneGoodForDayOrders(); }}{}
+
+Orderbook::~Orderbook(){
+    // flush all the data in core cache to ram 
+    shutdown_.store(true,std::memory_order_release);
+    shutdownConditionVariable_.notify_one();
+    orderPruneThread_.join();
 }

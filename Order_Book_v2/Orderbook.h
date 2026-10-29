@@ -39,7 +39,7 @@ class Orderbook{
     // to get order location quickly
     std::unordered_map<OrderId,OrderEntry>orders_;
 
-    // mutex is termed as mutable as function are const and mutex state would need to be change from lock to unlock 
+    // mutable as we need allows it to be modified even inside a const member function.
     mutable std::mutex ordersMutex_;
     std::thread orderPruneThread_;
     std::atomic<bool>shutdown_;
