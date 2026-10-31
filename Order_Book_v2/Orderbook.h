@@ -48,6 +48,7 @@ class Orderbook{
     bool CanMatch(Side side, Price price)const;
     void OnOrderAdded(OrderPointer);
     void OnOrderCancel(OrderPointer);
+    void OnOrderMatch(Price price,Quantity quantity,bool isFulllyFilled);
 
     Trades MatchOrders();
     void UpdateLevelInfo(Price price,Quantity quantity,LevelActions::Action action);

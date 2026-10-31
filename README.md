@@ -94,11 +94,20 @@ This directory is a more advanced iteration with additional trading abstractions
 
 It reflects the complexity of real order-book processing in financial markets.
 
+Run the standalone Order_Book_v2 tests from the repository root:
+
+```bash
+clang++ -std=c++20 -pthread -IOrder_Book_v2 \
+  Order_Book_v2/Orderbook.cpp Order_Book_v2/orderbook_test.cpp \
+  -o orderbook_v2_test
+./orderbook_v2_test
+```
+
 ## Getting Started
 
 ### Prerequisites
 
-- C++17 or newer
+- C++17 for most examples; C++20 for `Order_Book_v2`
 - CMake (for the order book v1 project)
 - A C++ compiler such as `g++` or `clang++`
 - Optional: Google Test for the v1 test target

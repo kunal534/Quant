@@ -26,6 +26,7 @@ class Order{
     Side GetSide() const {return side_;}
     OrderType GetOrderType() const {return ordertype_;}
     bool isFilled() const { return remainingQuantity_==0?1:0; }
+    Quantity GetIntialQuantity() const{return initialQuantity_;}
     
     void Fill(Quantity quantity)
     {
@@ -33,6 +34,7 @@ class Order{
         {
             throw std::logic_error(std::format("Order ({}) cannot be filled for more than it's remaining quantity",GetOrderId()));
         }
+        remainingQuantity_ -= quantity;
     }
 
     void GoodTillCancel(Price price ){

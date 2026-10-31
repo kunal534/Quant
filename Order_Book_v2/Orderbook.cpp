@@ -29,6 +29,7 @@ void Orderbook::CancelOrderInternals(OrderId orderid)
             asks_.erase(price);
         }
     }
+    OnOrderCancel(order);
 }
 
 void Orderbook::CancelOrders(OrderIds orderids)
@@ -52,7 +53,11 @@ void Orderbook::OnOrderCancel(OrderPointer order)
 }
 void Orderbook::OnOrderAdded(OrderPointer order)
 {
-    UpdateLevelInfo(order->GetPrice(),order->GetRemainingQuantity(),LevelActions::Action::Add);
+    UpdateLevelInfo(order->GetPrice(),order->GetIntialQuantity(),LevelActions::Action::Add);
+}
+void Orderbook::OnOrderMatch(Price price, Quantity quantity, bool isFullyFilled)
+{
+    UpdateLevelInfo(price,quantity,isFullyFilled?LevelActions::Action::Remove :LevelActions::Action::Match);
 }
 void Orderbook::UpdateLevelInfo(Price price,Quantity quantity,LevelActions::Action action)
 {
@@ -109,6 +114,8 @@ Trades Orderbook::MatchOrders()
                 Trade_Info(bid->GetOrderId(),bid->GetPrice(),common_q),
                 Trade_Info(ask->GetOrderId(),ask->GetPrice(),common_q)
             });
+            OnOrderMatch(bid->GetPrice(),common_q,bid->isFilled());
+            OnOrderMatch(ask->GetPrice(),common_q,ask->isFilled());
         }
         if(bids.empty())
         {

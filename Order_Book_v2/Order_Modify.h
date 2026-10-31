@@ -11,14 +11,14 @@ class OrderModify{
 
     OrderId GetOrderId() const {return orderid_;}
     Price GetPrice() const {return price_;}
-    Quantity GetQuantity() const {return orderid_;}
+    Quantity GetQuantity() const {return quantity_;}
     Side GetSide() const {return side_;}
 
     // a shared poiner to store new order which are modified
 
     OrderPointer ToOrderPointer(OrderType type)const
     {
-        return std::make_shared<Order>(type,GetOrderId(),GetPrice(),GetQuantity());
+        return std::make_shared<Order>(type,GetOrderId(),GetPrice(),GetQuantity(),GetSide());
     }
     
     private:
