@@ -82,6 +82,8 @@ Trades Orderbook::MatchOrders()
     trades.reserve(orders_.size());
     while(true)
     {
+        if(bids_.empty() || asks_.empty())break;
+
         auto&[BidPrice,bids]=*bids_.begin();
         auto&[AskPrice,asks]=*asks_.begin();
 

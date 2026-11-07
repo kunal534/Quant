@@ -38,6 +38,41 @@ void Check(bool condition, const char* message)
     }
 }
 
+void RunOneSidedOrderFlow()
+{
+    Orderbook book;
+    auto buy = MakeOrder(OrderType::Good_Till_Cancel, 1, Side::Buy, 100, 10);
+    auto sell = MakeOrder(OrderType::Good_Till_Cancel, 2, Side::Sell, 110, 10);
+
+    Check(book.AddOrder(buy).empty(), "an unmatched buy must not produce trades");
+    Check(buy->GetRemainingQuantity()==10, "an unmatched buy must remain open");
+    Check(book.AddOrder(sell).empty(), "non-crossing orders must not produce trades");
+    Check(sell->GetRemainingQuantity()==10, "an unmatched sell must remain open");
+}
+
+void RunCancelOrderFlow()
+{
+    Orderbook book;
+    Check(book.AddOrder(MakeOrder(
+        OrderType::Good_Till_Cancel, 1000, Side::Buy, 100, 1000)).empty(),
+        "baseline buy must not produce trades");
+    Check(book.AddOrder(MakeOrder(
+        OrderType::Good_Till_Cancel, 1001, Side::Sell, 110, 1000)).empty(),
+        "non-crossing baseline sell must not produce trades");
+
+    for(OrderId id = 1; id <= 256; ++id)
+    {
+        Check(book.AddOrder(MakeOrder(
+            OrderType::Good_Till_Cancel, id, Side::Buy, 99, 1)).empty(),
+            "an unmatched buy must not produce trades");
+    }
+
+    for(OrderId id = 1; id <= 256; ++id)
+    {
+        book.CancelOrder(id);
+    }
+}
+
 void RunRandomOrderFlow()
 {
     constexpr unsigned seed = 0x51A7u;
@@ -158,6 +193,8 @@ int main()
 {
     try
     {
+        RunOneSidedOrderFlow();
+        RunCancelOrderFlow();
         RunRandomOrderFlow();
     }
     catch(const std::exception& error)
