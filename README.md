@@ -107,9 +107,11 @@ clang++ -std=c++20 -pthread -IOrder_Book_v2 \
 
 The Google Benchmark suite measures unmatched order additions, additions that
 match resting orders, cancellations, and modifications. Setup is excluded from
-the timed batches, and each scenario runs 10 batches to keep setup/calibration
-time bounded. The output reports time per batch and processed operations per
-second; these are measurements, not a single universal order-book score.
+the timed batches, and each scenario runs 1,000 batches. The output reports
+time per batch and processed operations per second, plus per-operation
+`p50_ns` and `p99_ns` latency counters calculated from the 256,000 operation
+samples in each scenario. Latencies include the clock-reading overhead; these
+are measurements, not a single universal order-book score.
 
 Install Google Benchmark if needed (for example, `brew install google-benchmark`
 on macOS), then build and run from the repository root:
@@ -122,6 +124,18 @@ clang++ -std=c++20 -O3 -DNDEBUG -pthread -IOrder_Book_v2 \
   Order_Book_v2/Orderbook.cpp Order_Book_v2/orderbook_benchmark.cpp \
   -lbenchmark -o build/orderbook_v2_benchmark
 ./build/orderbook_v2_benchmark
+```
+
+If your terminal is already in `Order_Book_v2`, use:
+
+```bash
+mkdir -p ../build
+clang++ -std=c++20 -O3 -DNDEBUG -pthread -I. \
+  -I"$(brew --prefix google-benchmark)/include" \
+  -L"$(brew --prefix google-benchmark)/lib" \
+  Orderbook.cpp orderbook_benchmark.cpp \
+  -lbenchmark -o ../build/orderbook_v2_benchmark
+../build/orderbook_v2_benchmark
 ```
 
 To save machine-readable results:
