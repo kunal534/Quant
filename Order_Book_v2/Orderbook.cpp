@@ -321,11 +321,9 @@ void Orderbook::PruneGoodForDayOrders()
         {
             std::scoped_lock orderlock{ordersMutex_};
 
-            for(const auto&[_,entry]:orders_)
+            for(const auto& mapEntry : orders_)
             {
-                // getting to the order
-                const auto&[order,_]=entry;
-                
+                const auto& order = mapEntry.second.order_;
                 if(order->GetOrderType()==OrderType::Good_for_day)
                 {
                     orderIds_.push_back(order->GetOrderId());
@@ -336,7 +334,10 @@ void Orderbook::PruneGoodForDayOrders()
     }
 }
 // lambda initialisation
-Orderbook::Orderbook(): orderPruneThread_ { [this] {PruneGoodForDayOrders(); }}{}
+Orderbook::Orderbook():
+    shutdown_{false},
+    orderPruneThread_{[this] { PruneGoodForDayOrders(); }}
+{}
 
 Orderbook::~Orderbook(){
     // flush all the data in core cache to ram 

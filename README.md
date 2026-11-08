@@ -105,52 +105,38 @@ clang++ -std=c++20 -pthread -IOrder_Book_v2 \
 
 ### Benchmark Order_Book_v2
 
-The Google Benchmark suite measures unmatched order additions, additions that
-match resting orders, cancellations, and modifications. Setup is excluded from
-the timed batches, and each scenario runs 1,000 batches. The output reports
-time per batch and processed operations per second, plus per-operation
-`p50_ns` and `p99_ns` latency counters calculated from the 256,000 operation
-samples in each scenario. Latencies include the clock-reading overhead; these
-are measurements, not a single universal order-book score.
+BenchmarkSuite measures unmatched order additions, additions that match
+resting orders, cancellations, and modifications. Each sample batches 1,000
+operations, with setup outside the measured region. On Apple ARM64 it uses
+Apple's `kperf/kpc` hardware counters when available and reports counters such
+as cycles per operation, avoiding `CNTVCT_EL0`'s 41.7 ns timer-tick granularity.
+Its wall-time measurements are still based on a clock and reported as batch
+time; hardware cycle counts are not a fixed-time unit.
 
-Install Google Benchmark if needed (for example, `brew install google-benchmark`
-on macOS), then build and run from the repository root:
-
-```bash
-mkdir -p build
-clang++ -std=c++20 -O3 -DNDEBUG -pthread -IOrder_Book_v2 \
-  -I"$(brew --prefix google-benchmark)/include" \
-  -L"$(brew --prefix google-benchmark)/lib" \
-  Order_Book_v2/Orderbook.cpp Order_Book_v2/orderbook_benchmark.cpp \
-  -lbenchmark -o build/orderbook_v2_benchmark
-./build/orderbook_v2_benchmark
-```
-
-If your terminal is already in `Order_Book_v2`, use:
+The macOS counter backend uses Apple's private `kperf/kpc` API and requires
+elevated privileges. Counter availability can still depend on macOS security
+settings. If unavailable, the benchmark reports timing without hardware-counter
+columns and prints a diagnostic. Configure and build from the repository root
+(CMake 3.28 or newer):
 
 ```bash
-mkdir -p ../build
-clang++ -std=c++20 -O3 -DNDEBUG -pthread -I. \
-  -I"$(brew --prefix google-benchmark)/include" \
-  -L"$(brew --prefix google-benchmark)/lib" \
-  Orderbook.cpp orderbook_benchmark.cpp \
-  -lbenchmark -o ../build/orderbook_v2_benchmark
-../build/orderbook_v2_benchmark
+cmake -S Order_Book_v2 -B build/orderbook_v2 -DCMAKE_BUILD_TYPE=Release
+cmake --build build/orderbook_v2 --target orderbook_v2_benchmark
+sudo ./build/orderbook_v2/orderbook_v2_benchmark
 ```
 
-To save machine-readable results:
-
-```bash
-./build/orderbook_v2_benchmark \
-  --benchmark_format=json --benchmark_out=build/orderbook_v2_benchmark.json
-```
+The benchmark suite batches 1,000 operations per sample and reports batch
+elapsed time, throughput, and hardware counters per operation when available.
+Cache eviction is disabled to retain warm-workload behavior. Its Welch's t-test
+features are intended for comparisons between multiple implementations; this
+orderbook target currently benchmarks one implementation per scenario.
 
 ## Getting Started
 
 ### Prerequisites
 
 - C++17 for most examples; C++20 for `Order_Book_v2`
-- CMake (for the order book v1 project)
+- CMake 3.28 or newer for the Order_Book_v2 benchmark
 - A C++ compiler such as `g++` or `clang++`
 - Optional: Google Test for the v1 test target
 

@@ -41,9 +41,9 @@ class Orderbook{
 
     // mutable as we need allows it to be modified even inside a const member function.
     mutable std::mutex ordersMutex_;
-    std::thread orderPruneThread_;
     std::atomic<bool>shutdown_;
-    std::condition_variable shutdownConditionVariable_;// used to interupt sleeping thread
+    std::condition_variable shutdownConditionVariable_;
+    std::thread orderPruneThread_;
     bool CanFullyFill(Side side,Price price,Quantity quantity)const;
     bool CanMatch(Side side, Price price)const;
     void OnOrderAdded(OrderPointer);
