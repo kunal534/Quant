@@ -1,0 +1,100 @@
+{
+  "context": {
+    "date": "2026-11-08T16:34:45+05:30",
+    "host_name": "Kunal-MacBook.local",
+    "executable": "./build/orderbook_v2_benchmark",
+    "num_cpus": 8,
+    "mhz_per_cpu": 24,
+    "cpu_scaling_enabled": false,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 65536,
+        "num_sharing": 0
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 131072,
+        "num_sharing": 0
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 4194304,
+        "num_sharing": 1
+      }
+    ],
+    "load_avg": [2.51758,2.55225,2.60938],
+    "library_version": "v1.10.0",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "BM_AddOrder_NoMatch/iterations:1000/manual_time",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_AddOrder_NoMatch/iterations:1000/manual_time",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000,
+      "real_time": 9.1897541666666628e+04,
+      "cpu_time": 1.3752300000000029e+05,
+      "time_unit": "ns",
+      "avg_ns_per_op": 9.1897541666666669e+01,
+      "items_per_second": 1.0881683904311918e+07
+    },
+    {
+      "name": "BM_AddOrder_WithMatch/iterations:1000/manual_time",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "BM_AddOrder_WithMatch/iterations:1000/manual_time",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000,
+      "real_time": 2.1058841666666683e+05,
+      "cpu_time": 2.3124899999999983e+05,
+      "time_unit": "ns",
+      "avg_ns_per_op": 2.1058841666666666e+02,
+      "items_per_second": 4.7485992621468138e+06
+    },
+    {
+      "name": "BM_CancelOrder/iterations:1000/manual_time",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "BM_CancelOrder/iterations:1000/manual_time",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000,
+      "real_time": 5.3790500000000386e+04,
+      "cpu_time": 1.5672100000000012e+05,
+      "time_unit": "ns",
+      "avg_ns_per_op": 5.3790500000000002e+01,
+      "items_per_second": 1.8590643329212274e+07
+    },
+    {
+      "name": "BM_ModifyOrder/iterations:1000/manual_time",
+      "family_index": 3,
+      "per_family_instance_index": 0,
+      "run_name": "BM_ModifyOrder/iterations:1000/manual_time",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000,
+      "real_time": 1.4161387499999983e+05,
+      "cpu_time": 2.7441199999999988e+05,
+      "time_unit": "ns",
+      "avg_ns_per_op": 1.4161387500000001e+02,
+      "items_per_second": 7.0614549598335698e+06
+    }
+  ]
+}
